@@ -9,6 +9,7 @@ django-filter==25.2
 django-modelcluster==6.4
 django-permissionedforms==0.1
 django-stubs-ext==5.2.7
+django-storages>=1.14
 django-taggit==6.1.0
 django-tasks==0.8.1
 django-treebeard==4.7.1
