@@ -12,6 +12,7 @@ from django.contrib.auth.hashers import make_password, check_password
 # --- Imports ---
 from ninja.security import SessionAuth
 
+
 from internships.models import Internship
 from website.models import AboutPage
 from accounts.models import Profile, Education, Experience
@@ -31,7 +32,7 @@ api_router.register_endpoint('documents', DocumentsAPIViewSet)
 
 
 # --- Django Ninja API ---
-api = NinjaAPI(auth=SessionAuth())
+api = NinjaAPI(auth=SessionAuth(), csrf=True)
 
 # -----------------------------------------------
 # Schemas
