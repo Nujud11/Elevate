@@ -1,0 +1,172 @@
+{% extends "website/base_site.html" %}
+{% load wagtailimages_tags static %}
+
+{% block content %}
+
+<datalist id="title-suggestions">
+    {% for title in all_titles %}
+        <option value="{{ title }}">
+    {% endfor %}
+</datalist>
+<datalist id="location-suggestions">
+    {% for loc in all_locations %}
+        <option value="{{ loc }}">
+    {% endfor %}
+</datalist>
+<datalist id="company-suggestions">
+    {% for comp in all_companies %}
+        <option value="{{ comp }}">
+    {% endfor %}
+</datalist>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
+
+    <header class="mb-10">
+        <h2 class="text-ink text-3xl font-extrabold">Browse Internships</h2>
+        <p class="text-muted text-lg">Find opportunities and apply in one click</p>
+    </header>
+    
+    <form action="." method="GET" id="browse-form">
+        
+        <div class="mb-8 bg-bg-soft p-6 rounded-lg border border-line">
+            <div class="flex flex-col lg:flex-row gap-4 items-end">
+                
+                <div class="flex-1 w-full relative">
+                    <label for="id_q" class="sr-only">Enter title</label>
+                    <input type="search" name="q" id="id_q" value="{{ q|default:'' }}" 
+                           class="w-full p-3 pl-10 border border-line rounded-md focus:ring-brand focus:border-brand"
+                           placeholder="Enter title"
+                           list="title-suggestions"> <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </div>
+                
+                <div class="flex-1 w-full relative">
+                    <label for="id_loc" class="sr-only">Enter location</label>
+                    <input type="text" name="loc" id="id_loc" value="{{ loc|default:'' }}"
+                           class="w-full p-3 pl-10 border border-line rounded-md focus:ring-brand focus:border-brand"
+                           placeholder="Enter location"
+                           list="location-suggestions"> <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                </div>
+
+                <div class="flex-1 w-full relative">
+                    <label for="id_comp" class="sr-only">Enter Company name</label>
+                    <input type="text" name="comp" id="id_comp" value="{{ comp|default:'' }}"
+                           class="w-full p-3 pl-10 border border-line rounded-md focus:ring-brand focus:border-brand"
+                           placeholder="Enter Company name"
+                           list="company-suggestions"> <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2M5 21H3M16 15h2m-2 4h2M6 15h2m-2 4h2"></path></svg>
+                </div>
+
+                <button type="submit" class="btn btn-primary lg:w-32 w-full">Search</button>
+            </div>
+        </div>
+    
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+            
+            <div class="flex items-center gap-4 mb-4 md:mb-0">
+                <h3 class="font-bold text-ink text-lg">Filter</h3>
+                <div class="relative">
+                  <select name="remote_filter" 
+                          onchange="document.getElementById('browse-form').submit();"
+                          class="appearance-none bg-bg-soft border border-line rounded-md p-2 pr-8 text-sm text-ink">
+            
+                    <option value="" {% if remote_filter == "" %}selected{% endif %}>All Opportunities</option>
+                    
+                    <option value="1" {% if remote_filter == "1" %}selected{% endif %}>Remote Only</option>
+                    
+                    <option value="0" {% if remote_filter == "0" %}selected{% endif %}>On-Site Only</option>
+                </select>
+                    <svg class="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </div>
+            </div>
+
+            <h3 class="text-ink text-xl font-semibold">
+                All Opportunites (<span class="text-brand">{{ total_count|default:"0" }}</span>)
+            </h3>
+        </div>
+    </form>
+    
+    {% if page_obj.object_list %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {% for job in page_obj.object_list %}
+        <div class="card flex flex-col justify-between">
+            <div>
+                <div class="flex justify-between items-start mb-2">
+                    <h4 class="text-lg font-semibold text-ink leading-tight pr-2">{{ job.title }}</h4>
+                    <span class="{% if job.is_remote %}badge-remote{% else %}badge-onsite{% endif %} flex-shrink-0">
+                        {% if job.is_remote %}REMOTE{% else %}ON-SITE{% endif %}
+                    </span>
+                </div>
+                
+                <div class="flex items-center space-x-3 mb-3">
+                  {% with owner_profile=job.owner.profile %}
+                      {% if owner_profile.avatar %}
+                          <img src="{{ owner_profile.avatar.url }}" class="h-8 w-8 object-cover rounded-full" alt="{{ job.owner.username }} avatar">
+                      {% else %}
+                          <div class="h-8 w-8 bg-line rounded-full flex items-center justify-center text-xs font-bold text-muted">{{ job.owner.username|slice:":1"|upper }}</div>
+                      {% endif %}
+                  {% endwith %}
+                  
+                  <div class="flex flex-col">
+                      <p class="text-sm font-medium text-ink">{{ job.owner.username }}</p>
+                      <p class="text-sm text-muted">{{ job.location }}</p>
+                  </div>
+              </div>
+            </div>
+            
+            <div class="flex space-x-3 mt-4">
+    
+              <a href="{% url 'student_detail' pk=job.pk %}" 
+                 class="btn btn-ghost flex-1 btn-sm 
+                 {% if not request.user.is_authenticated or not request.user.profile.is_student %}w-full{% endif %}">
+                  View details
+              </a>
+              
+              {% if request.user.is_authenticated and request.user.profile.is_student %}
+                  {% if job.id in applied_internship_ids %}
+                      <button disabled class="btn btn-ghost flex-1 btn-sm opacity-70 border-accent text-accent cursor-not-allowed">
+                          Applied
+                      </button>
+                  {% else %}
+                      <a href="{% url 'student_apply' pk=job.pk %}" class="btn btn-primary flex-1 btn-sm">
+                          Apply now
+                      </a>
+                  {% endif %}
+              {% endif %}
+              </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-16 bg-bg-soft rounded-lg border border-line">
+        <p class="text-xl text-ink font-semibold mb-2">No internships found.</p>
+        <p class="text-muted">Try adjusting your search filters.</p>
+    </div>
+    {% endif %}
+
+    {% if page_obj.has_other_pages %}
+    <div class="flex justify-center mt-12 space-x-4 text-brand font-medium">
+        
+        {% with q=request.GET.q loc=request.GET.loc comp=request.GET.comp remote_filter=request.GET.remote_filter %}
+            {% with query_string="" %}
+                {% if q %}{% with query_string=query_string|add:"&q="|add:q|urlencode %}{% endwith %}{% endif %}
+                {% if loc %}{% with query_string=query_string|add:"&loc="|add:loc|urlencode %}{% endwith %}{% endif %}
+                {% if comp %}{% with query_string=query_string|add:"&comp="|add:comp|urlencode %}{% endwith %}{% endif %}
+                {% if remote_filter %}{% with query_string=query_string|add:"&remote_filter="|add:remote_filter|urlencode %}{% endwith %}{% endif %}
+
+                {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}{{ query_string }}" class="hover:text-accent">previous</a>
+                {% endif %}
+                
+                {% if page_obj.has_previous and page_obj.has_next %}
+                    <span class="text-muted">|</span>
+                {% endif %}
+
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}{{ query_string }}" class="hover:text-accent">next</a>
+                {% endif %}
+            {% endwith %}
+        {% endwith %}
+    </div>
+    {% endif %}
+
+</div>
+{% endblock content %}

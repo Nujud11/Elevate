@@ -1,0 +1,34 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{% block title %}Elevate{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="{% static 'core.css' %}" rel="stylesheet">
+</head>
+<body>
+  <header class="site-header">
+    <a href="/" class="brand">ELEVATE</a>
+    <nav>
+      <a href="{% url 'student_browse' %}">Browse</a>
+    </nav>
+  </header>
+
+  {% if messages %}
+    <ul class="messages">
+      {% for m in messages %}
+        <li class="{{ m.tags }}">{{ m }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <small>Built for your internship hub training.</small>
+  </footer>
+</body>
+</html>

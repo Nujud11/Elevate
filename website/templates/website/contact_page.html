@@ -1,0 +1,117 @@
+{% extends "website/base_site.html" %}
+{% load static wagtailcore_tags %}
+
+{% block content %}
+
+<div class="h-40 flex flex-col items-center justify-center text-center px-4 sm:px-6 lg:px-8" style="background: linear-gradient(to right, #fdf4f2, var(--color-accent) 80%);">
+    <h1 class="text-ink text-4xl font-extrabold mb-2">{{ page.page_heading }}</h1>
+    {% if page.intro %}
+        <div class="prose max-w-2xl text-muted text-lg mt-2">
+            {{ page.intro|richtext }}
+        </div>
+    {% else %}
+        <p class="max-w-2xl text-muted text-lg mt-2">Whether you have questions, feedback, or partnership inquiries – our team is here to help.</p>
+    {% endif %}
+</div>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 my-16">
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
+
+        {# Left Column: Get in Touch Info #}
+        <div class="md:col-span-1 bg-gradient-to-br from-bg-soft to-accent/10 p-8 rounded-lg shadow-md flex flex-col justify-between">
+            <h2 class="text-ink text-2xl font-bold mb-6">Get in Touch</h2>
+            <div class="space-y-6 text-muted text-lg flex-grow">
+                {% if page.working_hours_heading and page.working_hours_text %}
+                    <div>
+                        <p class="font-semibold text-ink text-xl mb-2">{{ page.working_hours_heading }}</p>
+                        <div class="text-base leading-relaxed">{{ page.working_hours_text|richtext }}</div>
+                    </div>
+                {% endif %}
+                {% if page.contact_email %}
+                    <div>
+                        <p class="font-semibold text-ink text-xl mb-2">Email:</p>
+                        <a href="mailto:{{ page.contact_email }}" class="text-brand hover:underline text-base">{{ page.contact_email }}</a>
+                    </div>
+                {% endif %}
+                {% if page.contact_phone %}
+                    <div>
+                        <p class="font-semibold text-ink text-xl mb-2">Phone:</p>
+                        <a href="tel:{{ page.contact_phone }}" class="text-brand hover:underline text-base">{{ page.contact_phone }}</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {# Right Column: Contact Form #}
+        <div class="md:col-span-2 card p-8 sm:p-10 shadow-lg">
+            <h2 class="text-ink text-2xl font-bold mb-6 text-center">Send Us a Message</h2>
+
+            {# Display Django messages (rendered by base_site.html, just ensure they appear above the form if needed) #}
+            {# No need for the {% if form_submitted %} block here #}
+
+            {% if form %}
+                <form method="post" action=".">
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div class="bg-rose/20 text-rose border border-rose p-3 rounded-md mb-4 text-sm" role="alert">
+                            {% for error in form.non_field_errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <div class="mb-5">
+                        <label for="{{ form.full_name.id_for_label }}" class="block text-ink font-medium mb-2 sr-only">Full Name</label>
+                        {{ form.full_name }}
+                        {% if form.full_name.errors %}<p class="text-rose text-sm mt-1">{{ form.full_name.errors.as_text }}</p>{% endif %}
+                    </div>
+                    <div class="mb-5">
+                        <label for="{{ form.phone_number.id_for_label }}" class="block text-ink font-medium mb-2 sr-only">Phone Number</label>
+                        {{ form.phone_number }}
+                        {% if form.phone_number.errors %}<p class="text-rose text-sm mt-1">{{ form.phone_number.errors.as_text }}</p>{% endif %}
+                    </div>
+                    <div class="mb-5">
+                        <label for="{{ form.email.id_for_label }}" class="block text-ink font-medium mb-2 sr-only">Email</label>
+                        {{ form.email }}
+                        {% if form.email.errors %}<p class="text-rose text-sm mt-1">{{ form.email.errors.as_text }}</p>{% endif %}
+                    </div>
+                    <div class="mb-6">
+                        <label for="{{ form.message.id_for_label }}" class="block text-ink font-medium mb-2 sr-only">Message</label>
+                        {{ form.message }}
+                        {% if form.message.errors %}<p class="text-rose text-sm mt-1">{{ form.message.errors.as_text }}</p>{% endif %}
+                    </div>
+                    <div class="text-center">
+                        <button type="submit"
+                                class="btn btn-lg shadow-md"
+                                style="background-color: var(--color-rose); color: white; border-color: var(--color-rose);">
+                            Send
+                        </button>
+                    </div>
+                </form>
+            {% else %}
+                <p class="text-center text-muted">Contact form is currently unavailable.</p>
+            {% endif %}
+        </div>
+    </div>{# End grid #}
+</div>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Apply styling to form inputs
+        const form = document.querySelector('form');
+        if (form) {
+            form.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], textarea').forEach(input => {
+                input.classList.add('w-full', 'p-3', 'border', 'rounded-md', 'focus:ring-brand', 'focus:border-brand', 'border-line', 'border-2');
+            });
+            form.querySelectorAll('textarea').forEach(textarea => {
+                textarea.classList.add('h-32', 'resize-y');
+            });
+        }
+    });
+</script>
+{% endblock extra_js %}
+
+{% endblock content %}

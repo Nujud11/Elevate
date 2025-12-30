@@ -1,0 +1,124 @@
+
+{% extends "website/base_site.html" %}
+{% load static %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
+
+    <div class="mb-10 text-center">
+        <h1 class="text-ink text-4xl font-extrabold mb-1">
+            Welcome, {{ request.user.first_name|default:request.user.username }}!
+        </h1>
+        <p class="text-muted text-lg">Thank you for your interest in this opportunity.</p>
+    </div>
+
+    <div class="detail-banner mb-10">
+        <h2 class="text-xl font-extrabold">{{ job.title }}</h2>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" class="bg-white p-10 rounded-lg max-w-5xl mx-auto border-2 border-line shadow-md">
+        {% csrf_token %}
+
+        <p class="text-ink text-lg mb-8 text-center">
+            Please share your latest CV and an optional Cover Letter below.
+        </p>
+
+        <div class="mb-8 border-t border-line pt-8">
+            <label for="{{ form.cv.id_for_label }}" class="block text-xl font-semibold text-ink mb-4 text-center">
+                Upload Your CV*
+            </label>
+            <div class="flex justify-center items-center flex-col">
+                {% if form.cv.errors %}
+                    <div class="text-rose text-sm mb-2">{{ form.cv.errors }}</div>
+                {% endif %}
+                <label for="{{ form.cv.id_for_label }}"
+                       class="btn btn-lg btn-upload-cv cursor-pointer w-64">
+                    Upload CV
+                </label>
+                <input type="file"
+                       name="{{ form.cv.name }}"
+                       id="{{ form.cv.id_for_label }}"
+                       class="input-hidden-file"
+                       onchange="updateFileName('{{ form.cv.id_for_label }}', 'cv-filename-display')"
+                       required> {# Assuming CV is required #}
+            </div>
+            <p id="cv-filename-display" class="text-sm text-muted text-center mt-2">
+                {% if form.cv.value.name %}
+                    Current file: <span class="text-brand font-medium">{{ form.cv.value.name }}</span>
+                {% else %}
+                    No file chosen
+                {% endif %}
+            </p>
+        </div>
+
+        <div class="mb-8 border-t border-line pt-8">
+            <label for="{{ form.cover_letter.id_for_label }}" class="block text-xl font-semibold text-ink mb-4 text-center">
+                Upload Cover Letter (Optional)
+            </label>
+            <div class="flex justify-center items-center flex-col">
+                {% if form.cover_letter.errors %}
+                    <div class="text-rose text-sm mb-2">{{ form.cover_letter.errors }}</div>
+                {% endif %}
+                <label for="{{ form.cover_letter.id_for_label }}"
+                       class="btn btn-lg btn-ghost cursor-pointer w-64"> {# Used ghost style #}
+                    Upload Cover Letter
+                </label>
+                <input type="file"
+                       name="{{ form.cover_letter.name }}"
+                       id="{{ form.cover_letter.id_for_label }}"
+                       class="input-hidden-file"
+                       onchange="updateFileName('{{ form.cover_letter.id_for_label }}', 'cover-letter-filename-display')">
+            </div>
+            <p id="cover-letter-filename-display" class="text-sm text-muted text-center mt-2">
+                 {% if form.cover_letter.value.name %}
+                    Current file: <span class="text-brand font-medium">{{ form.cover_letter.value.name }}</span>
+                {% else %}
+                    No file chosen
+                {% endif %}
+            </p>
+        </div>
+
+        <p class="text-sm text-muted text-center max-w-lg mx-auto mb-6">
+            Before submitting, please ensure your profile is complete and accurate...
+        </p>
+
+        <div class="text-center">
+            <button type="submit"
+                    class="btn btn-lg shadow-lg"
+                    style="background-color: var(--color-rose); color: var(--color-ink); border-color: var(--color-rose);">
+                Submit Application
+            </button>
+        </div>
+    </form>
+</div>
+
+{% block extra_js %}
+<script>
+    // Pure JavaScript function to update the display based on browser file input state
+    function updateFileName(inputId, displayId) {
+        const input = document.getElementById(inputId);
+        const display = document.getElementById(displayId);
+        // This is pure JavaScript, checks the input in the browser
+        if (input.files && input.files.length > 0) {
+            display.innerHTML = `Selected file: <span class="text-brand font-medium">${input.files[0].name}</span>`;
+        } else {
+             // If the user clears the file input, reset the text
+             // We rely on the initial HTML render (above) to show existing files
+             // Only reset if the display doesn't already show 'Current file:'
+             if (!display.textContent.includes('Current file:')) {
+                 display.innerHTML = 'No file chosen';
+             }
+        }
+    }
+
+    // Run once when the page loads to handle browser state, but HTML already shows initial server state
+    document.addEventListener('DOMContentLoaded', function() {
+        // These calls ensure the JS state matches the initial render if needed,
+        // but the main job is done by the HTML <p> tags above using Django's {{ form.field.value.name }}
+        updateFileName('{{ form.cv.id_for_label }}', 'cv-filename-display');
+        updateFileName('{{ form.cover_letter.id_for_label }}', 'cover-letter-filename-display');
+    });
+</script>
+{% endblock extra_js %}
+
+{% endblock content %}

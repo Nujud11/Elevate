@@ -1,0 +1,153 @@
+{% extends "website/base_site.html" %}
+{% load static %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 mb-20">
+
+    <div class="detail-banner mb-10">
+        <h1 class="text-3xl font-extrabold">{{ internship.title }} Applicants</h1>
+        <p class="mt-2 text-muted text-sm">
+            Total Applicants: {{ total_applicants_count }} | 
+            <a href="{% url 'company_applications_export' pk=internship.pk %}" class="text-brand hover:underline">Export CSV</a>
+        </p>
+    </div>
+
+    <form action="." method="GET" id="filter-form" class="mb-8 bg-bg-soft p-6 rounded-lg border border-line">
+        <div class="flex flex-col md:flex-row gap-4 items-end">
+            
+            <div class="flex-1 w-full relative">
+                <label for="id_q" class="block text-sm font-medium text-ink mb-1">Search by Name/Email</label>
+                <input type="search" name="q" id="id_q" value="{{ q|default:'' }}" 
+                       class="w-full p-3 pl-10 border border-line rounded-md focus:ring-brand focus:border-brand"
+                       placeholder="Enter student name or email...">
+                <svg class="absolute left-3 top-10 transform -translate-y-1/2 w-5 h-5 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </div>
+            
+            <div class="flex-1 w-full relative">
+                <label for="id_status" class="block text-sm font-medium text-ink mb-1">Filter by Status</label>
+                <select name="status" id="id_status"
+                        class="w-full appearance-none bg-white border border-line rounded-md p-3 pr-8 text-ink">
+                  {% for value, label in status_choices %}
+                    <option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>
+                  {% endfor %}
+                </select>
+                <svg class="absolute right-3 top-10 transform -translate-y-1/2 w-4 h-4 text-muted pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </div>
+
+            <button type="submit" class="btn btn-primary md:w-32 w-full">Filter</button>
+        </div>
+    </form>
+    {% if applications %}
+    <div class="space-y-4">
+        {% for app in applications %}
+        <div class="card flex items-center p-4 justify-between bg-bg-soft">
+
+            <div class="flex items-start space-x-4 flex-1 min-w-0">
+                <div class="h-10 w-10 rounded-full overflow-hidden flex items-center justify-center bg-line text-lg font-bold text-ink flex-shrink-0 mt-1">
+                    {% with student_profile=app.student.profile %}
+                        {% if student_profile.avatar %}
+                            <img src="{{ student_profile.avatar.url }}" alt="{{ app.student.username }} avatar" class="h-full w-full object-cover">
+                        {% else %}
+                            {{ app.student.username|slice:":1"|upper }}
+                        {% endif %}
+                    {% endwith %}
+                </div>
+                <div class="min-w-0">
+                    <a href="{% url 'user_public_profile' pk=app.student.pk %}" class="text-ink text-lg font-semibold truncate hover:text-brand">
+                        {{ app.student.username }}
+                    </a>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-3 ml-4 flex-shrink-0">
+                <p class="text-muted text-xs text-right">
+                    Applied: <br>
+                    <span class="text-sm font-medium text-ink">{{ app.submitted_at|date:"d M Y" }}</span>
+                </p>
+                <a href="{% if app.cv %}{{ app.cv.url }}{% else %}#{% endif %}"
+                   target="_blank"
+                   title="Click to view CV/Resume"
+                   class="btn btn-sm shadow-md"
+                   style="background-color: var(--color-rose); color: var(--color-ink); border-color: var(--color-rose);">
+                    View Details
+                </a>
+
+                <form method="post" action="{% url 'company_application_status' pk=app.pk %}" class="flex items-center space-x-2 status-form">
+                    {% csrf_token %}
+                    <div class="relative">
+                        <select name="status"
+                                class="p-2 pr-8 text-sm font-medium rounded-md border-2 border-line cursor-pointer bg-bg-soft text-muted status-select"
+                                style="min-width: 8rem;">
+                            {% for status_key, status_label in status_choices %}
+                                <option value="{{ status_key }}"
+                                        {% if app.status == status_key %}selected{% endif %}>
+                                    {{ status_label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" 
+                            class="btn btn-disabled btn-sm status-save-button"
+                            onclick="return confirm('Are you sure you want to change this status?');"
+                            disabled>
+                        Save
+                    </button>
+                </form>
+                </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if page_obj.has_other_pages %}
+    <div class="flex justify-center mt-8 space-x-4 text-brand font-medium">
+        {% with q=request.GET.q status=request.GET.status %}
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}&q={{ q }}&status={{ status }}" class="hover:text-accent">previous</a>
+            {% endif %}
+            {% if page_obj.has_previous and page_obj.has_next %}<span class="text-muted">|</span>{% endif %}
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}&q={{ q }}&status={{ status }}" class="hover:text-accent">next</a>
+            {% endif %}
+        {% endwith %}
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div class="text-center py-16 bg-bg-soft rounded-lg border border-line">
+        <p class="text-xl text-ink font-semibold mb-2">No applicants found for these filters.</p>
+        <p class="text-muted">Try adjusting your search or filter.</p>
+    </div>
+    {% endif %}
+
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const statusForms = document.querySelectorAll('.status-form');
+        
+        statusForms.forEach(form => {
+            const select = form.querySelector('.status-select');
+            const saveButton = form.querySelector('.status-save-button');
+            const originalStatus = select.value;
+    
+            select.addEventListener('change', function() {
+                if (select.value === originalStatus) {
+                    // If user changes it back to original:
+                    // 1. Disable button
+                    saveButton.disabled = true;
+                    // 2. Remove Green class, Add Grey class
+                    saveButton.classList.remove('btn-primary');
+                    saveButton.classList.add('btn-disabled');
+                } else {
+                    // If user selects a NEW status:
+                    // 1. Enable button
+                    saveButton.disabled = false;
+                    // 2. Remove Grey class, Add Green class
+                    saveButton.classList.remove('btn-disabled');
+                    saveButton.classList.add('btn-primary');
+                }
+            });
+        });
+    });
+</script>
+{% endblock content %}

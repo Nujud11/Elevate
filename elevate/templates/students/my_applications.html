@@ -1,0 +1,84 @@
+{% extends "website/base_site.html" %}
+{% load static wagtailimages_tags %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
+
+    <div class="max-w-4xl mx-auto mb-10">
+        <h1 class="text-ink text-4xl font-extrabold mb-1">
+            Welcome, {{ request.user.first_name|default:request.user.username }}!
+        </h1>
+        <p class="text-muted text-lg">
+          Every application is a step forward. Keep tracking your progress toward your next great opportunity!
+        </p>
+    </div>
+
+    <div class="detail-banner mb-8 max-w-4xl mx-auto">
+        <h2 class="text-xl font-extrabold">Your Applications</h2>
+    </div>
+
+    {% if applications %}
+    <div class="space-y-4 max-w-4xl mx-auto">
+        {% for app in applications %}
+        <div class="card flex items-center p-4 justify-between">
+            
+            <div class="flex items-center space-x-4 flex-1 min-w-0">
+                
+                <div class="h-10 w-10 rounded-full overflow-hidden flex items-center justify-center bg-accent text-lg font-bold text-brand flex-shrink-0">
+                    {% with owner_profile=app.internship.owner.profile %} {# Get profile #}
+                        {% if app.internship.logo %}
+                            {# 1. Use job-specific logo if available #}
+                            {% image app.internship.logo width-40 height-40 as company_logo %}
+                            <img src="{{ company_logo.url }}" class="h-full w-full object-contain" alt="{{ app.internship.owner.username }} logo">
+                        {% elif owner_profile.avatar %}
+                            {# 2. Use company profile avatar if job logo is missing #}
+                            <img src="{{ owner_profile.avatar.url }}" class="h-full w-full object-cover" alt="{{ app.internship.owner.username }} avatar">
+                        {% else %}
+                            {# 3. Fallback to initials if neither logo exists #}
+                            {{ app.internship.owner.username|slice:":1"|upper }}
+                        {% endif %}
+                    {% endwith %}
+                </div>
+                
+                <div class="min-w-0">
+                    <p class="text-ink text-lg font-semibold truncate">{{ app.internship.title }}</p>
+                    <p class="text-muted text-sm">{{ app.internship.owner.username }}</p>
+                </div>
+            </div>
+            
+            <div class="flex flex-col items-end space-y-1 ml-4 flex-shrink-0">
+                
+                {% with status_class="status-"|add:app.status|lower|cut:" " %} 
+                <span class="status-chip {{ status_class }}">{{ app.status }}</span>
+                {% endwith %}
+                <p class="text-muted text-xs">Submitted at {{ app.submitted_at|date:"d M Y" }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if page_obj.has_other_pages %}
+    <div class="flex justify-center mt-8 space-x-4 text-brand font-medium">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}" class="hover:text-accent">previous</a>
+        {% endif %}
+        
+        {% if page_obj.has_previous and page_obj.has_next %}
+            <span class="text-muted">|</span>
+        {% endif %}
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="hover:text-accent">next</a>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div class="text-center py-16 bg-bg-soft rounded-lg border border-line max-w-4xl mx-auto">
+        <p class="text-xl text-ink font-semibold mb-2">You haven't submitted any applications yet.</p>
+        <p class="text-muted">Find your first opportunity on the <a href="{% url 'student_browse' %}" class="text-brand font-medium hover:text-accent">Opportunities page</a>.</p>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock content %}

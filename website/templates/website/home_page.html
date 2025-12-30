@@ -1,0 +1,68 @@
+{% extends "website/base_site.html" %}
+{% load wagtailimages_tags static %}
+
+{% block content %}
+
+    {% with settings.website.SiteSettings as s %}
+        {% if s.header_bg %}
+            {% image s.header_bg original as hero_bg_img %}
+        {% endif %}
+
+        <section class="hero-section"
+            {% if hero_bg_img %}style="background-image: url('{{ hero_bg_img.url }}'); background-size: cover; background-position: center;"{% endif %}>
+            
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+                <div class="grid lg:grid-cols-2 gap-16 items-center">
+                  <div class="hero-content -mt-4"> 
+                    <h1 class="text-ink text-6xl font-extrabold leading-tight mb-4">
+                        {{ page.hero_title|default:"Elevate your Future with us! Find opportunities and apply in one click" }}
+                    </h1>
+                    <p class="text-xl text-muted mb-8">
+                        {{ page.hero_lead|default:"Thousands of internships in all the leading sector are waiting for you." }}
+                    </p>
+                </div>
+                    <div class="hero-image-col flex justify-center lg:justify-end">
+                            <img src="{{ hero_img.url }}" 
+                                 class="w-full max-w-lg lg:max-w-none h-auto" 
+                                 alt="{% if page.hero_title %}{{ page.hero_title }}{% else %}Elevate Illustration{% endif %}">
+                        {% else %}
+                            <img src="{% static 'media/imageg/Logo_z1a8iqO.width-700' %}" 
+                                 alt="Application process illustration" 
+                                 class="w-full max-w-lg lg:max-w-none h-auto">
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </section>
+    {% endwith %}
+
+    <section class="pb-16 text-center relative z-10"> 
+      <div class="max-w-md mx-auto px-4 sm:px-6 lg:px-8">
+          
+          {# Determine the correct URL based on role #}
+          {% if request.user.is_authenticated and request.user.profile.role == 'company' %}
+              {% url 'student_browse' as cta_target %}
+          {% else %}
+              {% url 'student_browse' as cta_target %}
+          {% endif %}
+  
+          <a href="{{ cta_target }}" class="btn btn-primary btn-lg shadow-xl hover:shadow-2xl">
+              {{ page.cta_text|default:"Explore Our Opportunities!" }}
+          </a>
+          
+          {% if not request.user.is_authenticated %}
+              <p class="mt-4 text-sm text-muted">
+                If you have not Join Us yet, <a href="{% url 'register' %}" class="text-brand font-medium hover:text-accent">Register Now!</a>
+              </p>
+          {% else %}
+              <p class="mt-4 text-sm text-muted">
+                Know someone who'd love Elevate? <a href="mailto:?subject=Check out Elevate&body=I'm using Elevate to find internships, you should too: {{ request.scheme }}://{{ request.get_host }}" class="text-brand font-medium hover:text-accent">Share with a friend!</a>
+              </p>
+          {% endif %}
+          </div>
+  </section>
+{% endblock content %}
+
+
+
+

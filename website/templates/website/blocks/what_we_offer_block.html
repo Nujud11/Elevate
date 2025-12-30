@@ -1,0 +1,14 @@
+{# Section for the three offer cards #}
+<section {% if self.section_id %}id="{{ self.section_id }}"{% endif %} class="mb-16 scroll-mt-20">
+    <h2 class="text-ink text-3xl font-bold mb-8 text-center">{{ self.section_title }}</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {% for card_data in self.cards %}
+            {# FIX: Added gradient background and text-center #}
+            <div class="card p-6 shadow-md text-center"
+            style="background: linear-gradient(to bottom right, var(--color-bg), rgba(238, 180, 166, 0.1));"> {# Corrected: rgba for rose with 10% opacity #}
+                <h3 class="text-brand text-2xl font-semibold mb-3">{{ card_data.title }}</h3>
+                <p class="text-muted leading-relaxed">{{ card_data.text }}</p>
+            </div>
+        {% endfor %}
+    </div>
+</section>

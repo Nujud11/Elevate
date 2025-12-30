@@ -1,0 +1,32 @@
+{% extends "base_elevate.html" %}
+{% load static %}
+
+{% block title %}Elevate — Internships in one click{% endblock %}
+
+{% block hero %}
+<section class="hero">
+  <div class="container grid-2">
+    <div class="stack-m">
+      <h1>
+        <span style="color:var(--brand);">Elevate</span> your Future with us!<br>
+        Find opportunities and apply in one click
+      </h1>
+      <p class="lead">Thousands of internships in all the leading sectors are waiting for you.</p>
+      <div class="stack-s">
+        <a class="btn btn-primary" href="{% url 'student_browse' %}">Explore Our Opportunities</a>
+        <div style="font-size:.95rem;color:var(--muted)">Join us now! <a href="{% url 'register' %}">Register</a></div>
+      </div>
+    </div>
+
+    <div class="card" style="padding:0; overflow:hidden; border-radius:18px;">
+      <img src="{% static 'elevate_ui/img/illustration.png' %}" alt="">
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block content %}
+  <div class="card card-muted" style="text-align:center">
+    <p style="margin:0">Ready to get started? Head to <a href="{% url 'student_browse' %}">Opportunities</a> and apply in one click.</p>
+  </div>
+{% endblock %}

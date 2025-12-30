@@ -1,0 +1,158 @@
+{% extends "website/base_site.html" %}
+{% load static %}
+
+{% block content %}
+<div class="h-40" style="background: linear-gradient(to right, #fdf4f2, var(--color-accent) 80%);"></div>
+
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-20">
+    
+    <div class="card p-10 shadow-xl">
+        
+        <header class="flex flex-wrap justify-between items-center mb-8 gap-4">
+          
+          <div class="flex items-center space-x-4">
+            <div class="h-16 w-16 rounded-full overflow-hidden border-2 border-brand flex items-center justify-center bg-bg-soft text-2xl font-bold text-brand flex-shrink-0">
+                {% if profile.avatar %}
+                    <img src="{{ profile.avatar.url }}" alt="{{ profile.full_name }} avatar" class="h-full w-full object-cover">
+                {% else %}
+                    {{ profile.full_name|default:profile.user.username|slice:":1"|upper }}
+                {% endif %}
+            </div>
+            <h1 class="text-ink text-3xl font-extrabold">
+                {{ profile.full_name|default:profile.user.username }} Profile
+            </h1>
+          </div>
+          
+          <div class="flex items-center space-x-4">
+            {% if profile.user == request.user %}
+                <a href="{% url 'account_profile_edit' %}" 
+                   class="btn btn-sm shadow-md"
+                   style="background-color: var(--color-rose); color: var(--color-ink); border-color: var(--color-rose);">
+                    Edit
+                </a>
+            {% endif %}
+          </div>
+        </header>
+        <div class="space-y-8">
+            
+            {% if profile.bio %}
+            <p class="text-lg text-ink leading-relaxed">
+                {{ profile.bio|linebreaksbr }}
+            </p>
+            {% endif %}
+
+            <div class="mb-5">
+                <p class="text-ink font-medium mb-2">Social Links</p>
+                <ul class="flex items-center space-x-4 text-sm text-ink">
+                    
+                    {% if profile.linkedin_url %}
+                    <li class="flex items-center">
+                        <a href="{{ profile.linkedin_url }}" target="_blank" title="LinkedIn" class="text-brand hover:opacity-75">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                              <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.784-1.75-1.75s.784-1.75 1.75-1.75 1.75.784 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                            </svg>
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% if profile.twitter_url %}
+                    <li class="flex items-center">
+                        <a href="{{ profile.twitter_url }}" target="_blank" title="X (Twitter)" class="text-brand hover:opacity-75">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24h-6.617l-5.21-6.817-6.044 6.817h-3.308l7.73-8.805-7.925-10.69h6.817l4.596 6.131 5.437-6.131zm-1.713 19.982h2.669l-18.13-20.945h-2.83l18.291 20.945z"/>
+                            </svg>
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% if profile.website_url %}
+                    <li class="flex items-center">
+                        <a href="{{ profile.website_url }}" target="_blank" title="Website" class="text-brand hover:opacity-75">
+                           <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                            </svg>
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    <li class="flex items-center space-x-2">
+                        <a href="mailto:{{ profile.user.email }}" class="text-brand hover:opacity-75" title="{{ profile.user.email }}">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zm-2 0l-8 5-8-5h16zm0 12H4V8l8 5 8-5v10z"/>
+                            </svg>
+                        </a>
+                        <a href="mailto:{{ profile.user.email }}" class="text-brand hover:underline">{{ profile.user.email }}</a>
+                    </li>
+                    
+                </ul>
+            </div>
+            {% if profile.is_student and profile.education.all %}
+            <div class="mb-6">
+                <p class="text-ink font-medium mb-2">Education</p>
+                <div class="space-y-3">
+                    {% for edu in profile.education.all %}
+                        <div class="p-3 bg-bg-soft border border-line rounded-md">
+                            <h4 class="font-bold text-ink">{{ edu.school_name }}</h4>
+                            {% if edu.degree %}<p class="text-sm text-muted">{{ edu.degree }}</p>{% endif %}
+                            {% if edu.start_date %}<p class="text-sm text-muted">{{ edu.start_date|date:"Y" }} - {{ edu.end_date|date:"Y"|default:"Present" }}</p>{% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if profile.is_student and profile.experience.all %}
+            <div class="mb-6">
+                <p class="text-ink font-medium mb-2">Work Experience</p>
+                <div class="space-y-3">
+                    {% for exp in profile.experience.all %}
+                        <div class="p-3 bg-bg-soft border border-line rounded-md">
+                            <h4 class="font-bold text-ink">{{ exp.role }}</h4>
+                            {% if exp.company_name %}<p class="text-sm text-muted">{{ exp.company_name }}</p>{% endif %}
+                            {% if exp.start_date %}<p class="text-sm text-muted">{{ exp.start_date|date:"b Y" }} - {{ exp.end_date|date:"b Y"|default:"Present" }}</p>{% endif %}
+                            {% if exp.description %}
+                                <p class="text-sm text-ink mt-2 whitespace-pre-wrap">{{ exp.description }}</p>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="mb-5">
+                <p class="text-ink font-medium mb-2">Language</p>
+                <div class="p-3 bg-bg-soft border border-line rounded-md text-ink">
+                    {{ profile.language|default:"Not specified" }}
+                </div>
+            </div>
+            
+            {% if profile.is_student %}
+            <div class="space-y-4 pt-4 border-t border-line">
+                
+                {% with cv_uploaded=profile.cv %}
+                <a href="{% if cv_uploaded %}{{ profile.cv.url }}{% else %}#{% endif %}" 
+                   target="_blank"
+                   class="btn btn-lg w-full bg-bg-soft border border-line text-brand {% if not cv_uploaded %}opacity-70 cursor-default{% endif %}">
+                    CV: {% if cv_uploaded %}Preview File{% else %}Not uploaded yet{% endif %}
+                </a>
+                {% endwith %}
+
+                <div class="space-y-4 pt-4">
+                    {% with cover_uploaded=profile.cover_letter %}
+                    <a href="{% if cover_uploaded %}{{ profile.cover_letter.url }}{% else %}#{% endif %}"
+                       target="_blank"
+                       class="btn btn-lg w-full bg-bg-soft border border-line text-brand {% if not cover_uploaded %}opacity-70 cursor-default{% endif %}">
+                        Cover Letter: {% if cover_uploaded %}Preview File{% else %}Not uploaded yet{% endif %}
+                    </a>
+                    {% endwith %}
+                </div>
+                <p class="text-sm text-muted text-center">
+                    Click 'Edit' to upload or update your documents.
+                </p>
+            </div>
+            {% endif %}
+
+        </div> </div>
+</div>
+
+{% endblock content %}

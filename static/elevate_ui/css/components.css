@@ -1,0 +1,227 @@
+/* elevate/static/elevate_ui/css/components.css */
+
+/* -----------------------------------
+   1. HERO COMPONENT
+----------------------------------- */
+
+.hero-section {
+  position: relative;
+  /* Reduced padding to make the section shorter */
+  padding-top: 4rem; 
+  padding-bottom: 4rem; 
+  /* REMOVED: min-height: 550px; to allow it to shrink */
+  overflow: hidden; 
+  display: flex; 
+  align-items: center;
+}
+
+
+/* Responsive adjustment for image/illustration column */
+@media (max-width: 979px) {
+  .hero-image-col {
+      display: none;
+  }
+}
+
+
+/* -----------------------------------
+   2. CARD COMPONENT
+----------------------------------- */
+.card {
+  background-color: var(--color-bg); /* white */
+  border: 1px solid var(--color-line); /* 1px border --line */
+  border-radius: var(--radius-md); /* radius 12px */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05); /* soft shadow */
+  padding: 1.5rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.job-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-muted);
+  font-size: 0.875rem; /* text-sm */
+  margin-top: 0.5rem;
+}
+
+/* Remote/On-Site Badge Styles */
+.badge-remote, .badge-onsite {
+  display: inline-flex;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.75rem; /* text-xs */
+  font-weight: 600;
+  border-radius: 6px;
+  line-height: 1;
+}
+
+.badge-remote {
+  background-color: var(--color-accent);
+  color: var(--color-brand);
+}
+
+.badge-onsite {
+  background-color: var(--color-rose);
+  color: var(--color-ink);
+}
+
+/* -----------------------------------
+   3. DETAIL COMPONENTS
+----------------------------------- */
+
+/* Large Banner/Strip for Job Title */
+.detail-banner {
+  background: linear-gradient(to right, var(--color-bg), var(--color-rose), var(--color-accent)); /* Subtle gradient matching hero theme */
+  padding: 1.5rem 2rem;
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  margin-bottom: 2rem;
+  text-align: center;
+}
+.detail-banner h1 {
+  font-size: 1.875rem; /* text-3xl */
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+/* Company Profile Header */
+.company-header {
+  background-color: var(--color-bg);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-line);
+  box-shadow: var(--shadow-sm);
+}
+.company-avatar {
+  height: 5rem;
+  width: 5rem;
+  border-radius: 50%;
+  background-color: var(--color-accent);
+  color: var(--color-brand);
+  font-size: 2.5rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Detail/Requirement Card (Uses existing .card structure but with specific padding/border) */
+.detail-card {
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-accent); /* Accent color border for emphasis */
+  border-radius: var(--radius-md); 
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+.detail-card h2 {
+  color: var(--color-ink);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--color-line);
+  padding-bottom: 0.5rem;
+}
+
+/* Meta Detail Items (Location, Posted, etc.) */
+.meta-detail-card {
+  background-color: var(--color-bg-soft);
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  margin-bottom: 1rem;
+}
+.meta-detail-card p {
+  font-size: 0.875rem;
+  color: var(--color-muted);
+}
+.meta-detail-card strong {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-ink);
+  display: block;
+}
+
+
+/* -----------------------------------
+   4. STATUS CHIPS/BADGES
+----------------------------------- */
+
+.status-chip {
+  display: inline-flex;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.75rem; /* text-xs */
+  font-weight: 600;
+  border-radius: 6px;
+  line-height: 1;
+  text-transform: uppercase;
+  text-align: center;
+  min-width: 5rem;
+  justify-content: center;
+}
+
+/* Status: New (Muted/Neutral) */
+.status-new {
+  background-color: var(--color-bg-soft);
+  color: var(--color-muted);
+  border: 1px solid var(--color-line);
+}
+
+/* Status: In Review (Accent/Process) - FIXED COLOR */
+.status-review {
+  background-color: #f0f3e6; /* Stronger light accent green for visibility */
+  color: var(--color-accent); /* Keeps the original accent green text */
+}
+
+/* Status: Accepted (Brand/Success) */
+.status-accepted {
+  background-color: #d1e8d7; /* Lightened version of brand */
+  color: var(--color-brand);
+}
+
+/* Status: Rejected (Rose/Negative) */
+.status-rejected {
+  background-color: #f7e6e3; /* Lightened version of rose */
+  color: var(--color-rose);
+}
+
+/* ... (inside 4. UTILITIES) ... */
+
+/* Status-to-Color Mappings for Dynamic Elements */
+.color-status-accepted { color: var(--color-brand); }
+.bg-status-accepted { background-color: var(--color-brand); }
+.color-status-rejected { color: var(--color-rose); }
+.bg-status-rejected { background-color: var(--color-rose); }
+.color-status-in-review { color: var(--color-accent); }
+.bg-status-in-review { background-color: var(--color-accent); }
+.color-status-new { color: var(--color-muted); }
+
+
+/* -----------------------------------
+   5. COMPANY MANAGEMENT COMPONENTS
+----------------------------------- */
+
+.company-header-strip {
+  /* Style for the logo, name, and background */
+  padding: 2rem 0;
+  margin-bottom: 2rem;
+}
+
+.add-internship-banner {
+  background: linear-gradient(to right, var(--color-bg), var(--color-rose), var(--color-accent)); /* Subtle gradient */
+  padding: 1.5rem 2rem;
+  border-radius: var(--radius-md);
+  text-align: center;
+  margin-bottom: 2.5rem;
+  color: var(--color-ink);
+  font-size: 1.5rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.add-internship-banner:hover {
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+}

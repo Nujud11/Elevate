@@ -1,0 +1,14 @@
+{% load wagtailcore_tags %}
+
+{# Simple section with optional ID for anchor links #}
+<section {% if self.section_id %}id="{{ self.section_id }}"{% endif %} class="mb-16 scroll-mt-20">
+    {# FIX: Added gradient background and text-center #}
+    <div class="p-8 rounded-lg text-center"
+    style="background: linear-gradient(to right, var(--color-bg-soft), rgba(166, 178, 139, 0.1));"> {# Corrected: rgba for accent with 10% opacity #}
+        <h2 class="text-ink text-3xl font-bold mb-4">{{ self.section_title }}</h2>
+        {# FIX: Added text-center to prose container #}
+        <div class="prose prose-lg max-w-none text-muted leading-relaxed text-center mx-auto">
+            {{ self.content|richtext }}
+        </div>
+    </div>
+</section>

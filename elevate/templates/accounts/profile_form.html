@@ -1,0 +1,334 @@
+{% extends "website/base_site.html" %}
+{% load static %}
+
+{% block content %}
+<div class="h-40" style="background: linear-gradient(to right, #fdf4f2, var(--color-accent) 80%);"></div>
+
+<style>
+  .empty-form-row {
+    display: none;
+  }
+</style>
+
+
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-20">
+    
+    <div class="card p-10 shadow-xl">
+        
+        <header class="flex justify-between items-center mb-8">
+            <h1 class="text-ink text-3xl font-extrabold">
+                Edit Profile
+            </h1>
+            <a href="{% url 'account_profile' %}" class="btn btn-ghost btn-sm">
+                Cancel
+            </a>
+        </header>
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+                <div class="bg-rose/20 text-rose border border-rose p-3 rounded-md mb-4 text-sm" role="alert">
+                    {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="grid lg:grid-cols-2 gap-x-12 gap-y-6">
+                <div>
+                    <div class="mb-6 border-b border-line pb-4">
+                        <label class="block text-ink font-medium mb-2">Profile Picture</label>
+                        <div class="flex items-center space-x-4">
+                            <div class="h-16 w-16 rounded-full overflow-hidden border-2 border-brand flex items-center justify-center bg-bg-soft text-2xl font-bold text-brand flex-shrink-0">
+                                {% if form.instance.avatar %}
+                                    <img src="{{ form.instance.avatar.url }}" alt="Current avatar" class="h-full w-full object-cover">
+                                {% else %}
+                                    {{ form.instance.full_name|default:form.instance.user.username|slice:":1"|upper }}
+                                {% endif %}
+                            </div>
+                            <div class="flex flex-col space-y-1">
+                                <label for="{{ form.avatar.id_for_label }}" class="btn btn-sm btn-upload-cv cursor-pointer">
+                                    Change Photo
+                                </label>
+                                <input type="file" name="{{ form.avatar.name }}" id="{{ form.avatar.id_for_label }}" class="input-hidden-file">
+                                {% if form.avatar.errors %}<p class="text-rose text-sm mt-1">{{ form.avatar.errors.as_text }}</p>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-5">
+                        <label for="{{ form.full_name.id_for_label }}" class="block text-ink font-medium mb-2">Full Name</label>
+                        {{ form.full_name }}
+                        {% if form.full_name.errors %}<p class="text-rose text-sm mt-1">{{ form.full_name.errors.as_text }}</p>{% endif %}
+                    </div>
+                    {% if request.user.profile.is_student %}
+                    <div class="mb-5">
+                        <label for="{{ form.gender.id_for_label }}" class="block text-ink font-medium mb-2">Gender</label>
+                        <div class="relative">
+                            {{ form.gender }}
+                            {% if form.gender.errors %}<p class="text-rose text-sm mt-1">{{ form.gender.errors.as_text }}</p>{% endif %}
+                            <svg class="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <div class="mb-5">
+                        <label for="{{ form.language.id_for_label }}" class="block text-ink font-medium mb-2">Language(s) (e.g., English, Arabic)</label>
+                        {{ form.language }}
+                        {% if form.language.errors %}<p class="text-rose text-sm mt-1">{{ form.language.errors.as_text }}</p>{% endif %}
+                    </div>
+                    {% if request.user.profile.is_student %}
+                    <div class="mb-5 border-t border-line pt-4">
+                        <label class="block text-ink font-medium mb-3">Documents</label>
+                        <div class="flex items-center space-x-3 mb-3">
+                            <label for="{{ form.cv.id_for_label }}" class="btn btn-sm btn-upload-cv cursor-pointer">
+                                Upload CV
+                            </label>
+                            <input type="file" name="{{ form.cv.name }}" id="{{ form.cv.id_for_label }}" class="input-hidden-file">
+                            <p class="text-sm text-muted truncate max-w-[200px]">
+                              Current: 
+                              {% if form.cv.value %}{% if form.cv.value.url %}<a href="{{ form.cv.value.url }}" target="_blank" class="text-brand hover:underline">View File</a>{% else %}{{ form.cv.value.name|default:"File Ready" }}{% endif %}{% else %}No file{% endif %}
+                            </p>
+                        </div>
+                        {% if form.cv.errors %}<p class="text-rose text-sm mt-1">{{ form.cv.errors.as_text }}</p>{% endif %}
+                        <div class="flex items-center space-x-3">
+                            <label for="{{ form.cover_letter.id_for_label }}" class="btn btn-sm btn-upload-cv cursor-pointer">
+                                Upload Cover Letter
+                            </label>
+                            <input type="file" name="{{ form.cover_letter.name }}" id="{{ form.cover_letter.id_for_label }}" class="input-hidden-file">
+                            <p class="text-sm text-muted truncate max-w-[200px]">
+                                Current: 
+                                {% if form.cover_letter.value %}{% if form.cover_letter.value.url %}<a href="{{ form.cover_letter.value.url }}" target="_blank" class="text-brand hover:underline">View File</a>{% else %}{{ form.cover_letter.value.name|default:"File Ready" }}{% endif %}{% else %}No file{% endif %}
+                            </p>
+                        </div>
+                        {% if form.cover_letter.errors %}<p class="text-rose text-sm mt-1">{{ form.cover_letter.errors.as_text }}</p>{% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+                <div>
+                    <div class="mb-6">
+                        <label for="{{ form.bio.id_for_label }}" class="block text-ink font-medium mb-2">About (Bio)</label>
+                        {{ form.bio }}
+                        {% if form.bio.errors %}<p class="text-rose text-sm mt-1">{{ form.bio.errors.as_text }}</p>{% endif %}
+                    </div>
+                    <div class="mt-8 border-t border-line pt-4">
+                        <p class="text-ink font-medium mb-3">
+                            {% if request.user.profile.is_company %}Contact Details{% else %}Social Links{% endif %}
+                        </p>
+                        <div class="mb-3">
+                            <label for="{{ form.linkedin_url.id_for_label }}" class="block text-muted text-sm mb-1">LinkedIn URL</label>
+                            {{ form.linkedin_url }}
+                            {% if form.linkedin_url.errors %}<p class="text-rose text-sm mt-1">{{ form.linkedin_url.errors.as_text }}</p>{% endif %}
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ form.twitter_url.id_for_label }}" class="block text-muted text-sm mb-1">X (Twitter) URL</label>
+                            {{ form.twitter_url }}
+                            {% if form.twitter_url.errors %}<p class="text-rose text-sm mt-1">{{ form.twitter_url.errors.as_text }}</p>{% endif %}
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ form.website_url.id_for_label }}" class="block text-muted text-sm mb-1">Website URL</label>
+                            {{ form.website_url }}
+                            {% if form.website_url.errors %}<p class="text-rose text-sm mt-1">{{ form.website_url.errors.as_text }}</p>{% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            {% if request.user.profile.is_student %}
+            
+            <fieldset class="border-t border-line pt-6 mt-6">
+                <legend class="text-2xl font-semibold mb-3">Education</legend>
+                <p class="text-muted text-sm mb-4">You can add up to {{ education_formset.max_num }} entries. Blank forms will be ignored.</p>
+
+                {{ education_formset.management_form }}
+                
+                {% if education_formset.non_form_errors %}
+                    <div class="bg-rose/20 text-rose border border-rose p-3 rounded-md mb-4 text-sm" role="alert">
+                        {% for error in education_formset.non_form_errors %}<p>{{ error }}</p>{% endfor %}
+                    </div>
+                {% endif %}
+                
+                <div id="education-form-list">
+                    {% for edu_form in education_formset %}
+                        <div class="p-4 border rounded mb-4 shadow-sm bg-bg-soft formset-row {% if not edu_form.instance.pk %}empty-form-row{% endif %}">
+                            
+                            {% if edu_form.instance.pk %}{{ edu_form.id }}{% endif %}
+                        
+                            {% if edu_form.non_field_errors %}<div class="text-rose text-sm mb-2" role="alert">...</div>{% endif %}
+                            
+                            <div class="grid md:grid-cols-2 gap-x-6">
+                                <div class="mb-3">
+                                    <label for="{{ edu_form.school_name.id_for_label }}" class="block text-ink font-medium mb-1 text-sm">School/University</label>
+                                    {{ edu_form.school_name }}
+                                    {% if edu_form.school_name.errors %}<p class="text-rose text-sm mt-1">{{ edu_form.school_name.errors.as_text }}</p>{% endif %}
+                                </div>
+                                <div class="mb-3">
+                                    <label for="{{ edu_form.degree.id_for_label }}" class="block text-ink font-medium mb-1 text-sm">Degree</label>
+                                    {{ edu_form.degree }}
+                                    {% if edu_form.degree.errors %}<p class="text-rose text-sm mt-1">{{ edu_form.degree.errors.as_text }}</p>{% endif %}
+                                </div>
+                                <div class="mb-3">
+                                    <label for="{{ edu_form.start_date.id_for_label }}" class="block text-ink font-medium mb-1 text-sm">Start Date</label>
+                                    {{ edu_form.start_date }}
+                                    {% if edu_form.start_date.errors %}<p class="text-rose text-sm mt-1">{{ edu_form.start_date.errors.as_text }}</p>{% endif %}
+                                </div>
+                                <div class="mb-3">
+                                    <label for="{{ edu_form.end_date.id_for_label }}" class="block text-ink font-medium mb-1 text-sm">End Date (or leave blank)</label>
+                                    {{ edu_form.end_date }}
+                                    {% if edu_form.end_date.errors %}<p class="text-rose text-sm mt-1">{{ edu_form.end_date.errors.as_text }}</p>{% endif %}
+                                </div>
+                            </div>
+                            {% if edu_form.instance.pk %}
+                                <div class="mt-2">
+                                    {{ edu_form.DELETE }}
+                                    <label for="{{ edu_form.DELETE.id_for_label }}" class="text-rose text-sm ml-2">Delete this entry</label>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+                <button type="button" id="add-education-form" class="btn btn-sm btn-ghost">
+                    + Add Another Education
+                </button>
+            </fieldset>
+
+            <fieldset class="border-t border-line pt-6 mt-6">
+                <legend class="text-2xl font-semibold mb-3">Work Experience</legend>
+                <p class="text-muted text-sm mb-4">You can add up to {{ experience_formset.max_num }} entries. Blank forms will be ignored.</p>
+
+                {{ experience_formset.management_form }}
+                
+                {% if experience_formset.non_form_errors %}
+                    <div class="bg-rose/20 text-rose border border-rose p-3 rounded-md mb-4 text-sm" role="alert">
+                        {% for error in experience_formset.non_form_errors %}<p>{{ error }}</p>{% endfor %}
+                    </div>
+                {% endif %}
+
+                <div id="experience-form-list">
+                    {% for exp_form in experience_formset %}
+                        <div class="p-4 border rounded mb-4 shadow-sm bg-bg-soft formset-row {% if not exp_form.instance.pk %}empty-form-row{% endif %}">
+                            {% if exp_form.instance.pk %}{{ exp_form.id }}{% endif %}
+                            
+                            <div class="grid md:grid-cols-2 gap-x-6">
+                                <div class="mb-3">
+                                    <label for="{{ exp_form.company_name.id_for_label }}" class="block text-ink font-medium mb-1 text-sm">Company Name</label>
+                                    {{ exp_form.company_name }}
+                                    {% if exp_form.company_name.errors %}<p class="text-rose text-sm mt-1">{{ exp_form.company_name.errors.as_text }}</p>{% endif %}
+                                </div>
+                                <div class="mb-3">
+                                    <label for="{{ exp_form.role.id_for_label }}" class="block text-ink font-medium mb-1 text-sm">Role / Title</label>
+                                    {{ exp_form.role }}
+                                    {% if exp_form.role.errors %}<p class="text-rose text-sm mt-1">{{ exp_form.role.errors.as_text }}</p>{% endif %}
+                                </div>
+                                <div class="mb-3">
+                                    <label for="{{ exp_form.start_date.id_for_label }}" class="block text-ink font-medium mb-1 text-sm">Start Date</label>
+                                    {{ exp_form.start_date }}
+                                    {% if exp_form.start_date.errors %}<p class="text-rose text-sm mt-1">{{ exp_form.start_date.errors.as_text }}</p>{% endif %}
+                                </div>
+                                <div class="mb-3">
+                                    <label for="{{ exp_form.end_date.id_for_label }}" class="block text-ink font-medium mb-1 text-sm">End Date (or leave blank)</label>
+                                    {{ exp_form.end_date }}
+                                    {% if exp_form.end_date.errors %}<p class="text-rose text-sm mt-1">{{ exp_form.end_date.errors.as_text }}</p>{% endif %}
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="{{ exp_form.description.id_for_label }}" class="block text-ink font-medium mb-1 text-sm">Description</label>
+                                {{ exp_form.description }}
+                                {% if exp_form.description.errors %}<p class="text-rose text-sm mt-1">{{ exp_form.description.errors.as_text }}</p>{% endif %}
+                            </div>
+                            {% if exp_form.instance.pk %}
+                                <div class="mt-2">
+                                    {{ exp_form.DELETE }}
+                                    <label for="{{ exp_form.DELETE.id_for_label }}" class="text-rose text-sm ml-2">Delete this entry</label>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+                
+                <button type="button" id="add-experience-form" class="btn btn-sm btn-ghost">
+                    + Add Another Experience
+                </button>
+            </fieldset>
+
+            {% endif %}
+            <div class="flex justify-end border-t border-line pt-6 mt-6">
+                <button type="submit" 
+                        class="btn btn-primary btn-lg shadow-md">
+                    Save Changes
+                </button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<script>
+    function applyFormStyles(rootElement) {
+        if (!rootElement) {
+            rootElement = document;
+        }
+        const selector = 'input[type="text"], input[type="email"], input[type="url"], input[type="number"], input[type="date"], textarea, select';
+        
+        rootElement.querySelectorAll(selector).forEach(input => {
+            let classesToAdd = ['w-full', 'p-3', 'border', 'rounded-md', 'focus:ring-brand', 'focus:border-brand', 'border-line', 'border-2'];
+            
+            if (input.tagName === 'TEXTAREA') {
+                if (!input.classList.contains('h-40')) {
+                    input.classList.add('h-24');
+                }
+                input.classList.add('resize-none', 'text-left', ...classesToAdd);
+            } else if (input.tagName === 'SELECT') {
+                input.classList.add('appearance-none', ...classesToAdd);
+            } else if (input.type !== 'file') {
+                input.classList.add(...classesToAdd);
+            }
+        });
+    }
+
+    function setupDynamicFormset(containerId, addBtnId) {
+        const formContainer = document.getElementById(containerId);
+        if (!formContainer) return; 
+        
+        const addFormBtn = document.getElementById(addBtnId);
+        if (!addFormBtn) return;
+        
+        // Find all the blank forms that are currently hidden
+        const hiddenForms = Array.from(formContainer.querySelectorAll('.empty-form-row'));
+        
+        let formsShownCount = 0; // Count how many forms we've made visible
+        
+        // --- THIS IS THE FIX ---
+        // Show the *first* blank form immediately
+        if (hiddenForms[formsShownCount]) {
+            hiddenForms[formsShownCount].style.display = 'block';
+            formsShownCount++;
+        }
+
+        // Hide the button if all available forms are already visible
+        if (formsShownCount >= hiddenForms.length) {
+            addFormBtn.style.display = 'none';
+        }
+
+        // When the "Add" button is clicked
+        addFormBtn.addEventListener('click', function() {
+            // Find the next form to show
+            const nextForm = hiddenForms[formsShownCount];
+            
+            if (nextForm) {
+                nextForm.style.display = 'block'; // Show it
+                formsShownCount++; // Increment the counter
+            }
+            
+            // If that was the last one, hide the button
+            if (formsShownCount >= hiddenForms.length) {
+                addFormBtn.style.display = 'none';
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        applyFormStyles(document.querySelector('form'));
+        setupDynamicFormset('education-form-list', 'add-education-form');
+        setupDynamicFormset('experience-form-list', 'add-experience-form');
+    });
+</script>
+
+{% endblock content %}

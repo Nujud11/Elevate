@@ -1,0 +1,136 @@
+{% extends "website/base_site.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 mb-20">
+
+    <header class="text-center mb-10">
+        <h1 class="text-ink text-3xl font-extrabold mb-2">
+            {% if object %}Edit Internship: {{ object.title }}{% else %}Add an Internship{% endif %}
+        </h1>
+        <p class="text-muted text-lg">
+            Find the best talent for your company
+        </p>
+    </header>
+
+    <div class="card p-8 sm:p-10 mx-auto max-w-4xl"> 
+        
+        <form method="post" action=".">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="bg-rose/20 text-rose border border-rose p-3 rounded-md mb-6 text-sm" role="alert">
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="grid lg:grid-cols-2 gap-x-8">
+
+                <div class="lg:col-span-2">
+                    
+                    <div class="mb-6">
+                        <label for="{{ form.title.id_for_label }}" class="block text-ink font-medium mb-2">Internship Title</label>
+                        {{ form.title }}
+                        {% if form.title.errors %}<p class="text-rose text-sm mt-1">{{ form.title.errors.as_text }}</p>{% endif %}
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div>
+                            <label for="{{ form.location.id_for_label }}" class="block text-ink font-medium mb-2">Location</label>
+                            {{ form.location }}
+                            {% if form.location.errors %}<p class="text-rose text-sm mt-1">{{ form.location.errors.as_text }}</p>{% endif %}
+                        </div>
+                        
+                        <div>
+                            <label for="{{ form.is_remote.id_for_label }}" class="block text-ink font-medium mb-2">Type (Remote or On-Sight)</label>
+                            <div class="relative">
+                                {{ form.is_remote }}
+                                {% if form.is_remote.errors %}<p class="text-rose text-sm mt-1">{{ form.is_remote.errors.as_text }}</p>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <label for="{{ form.description.id_for_label }}" class="block text-ink font-medium mb-2">Description</label>
+                        {{ form.description }}
+                        {% if form.description.errors %}<p class="text-rose text-sm mt-1">{{ form.description.errors.as_text }}</p>{% endif %}
+                    </div>
+                </div>
+                
+                <div class="lg:col-span-2">
+                    
+                    <div class="mb-6">
+                        <label for="{{ form.requirements.id_for_label }}" class="block text-ink font-medium mb-2">Requirements</label>
+                        {{ form.requirements }}
+                        {% if form.requirements.errors %}<p class="text-rose text-sm mt-1">{{ form.requirements.errors.as_text }}</p>{% endif %}
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4 mb-8 border-t border-line pt-6">
+                        <div>
+                            <label for="{{ form.deadline.id_for_label }}" class="block text-ink font-medium mb-2">Deadline</label>
+                            {{ form.deadline }}
+                            {% if form.deadline.errors %}<p class="text-rose text-sm mt-1">{{ form.deadline.errors.as_text }}</p>{% endif %}
+                        </div>
+                        
+                        <div>
+                            <label for="{{ form.is_active.id_for_label }}" class="block text-ink font-medium mb-2">Is Active</label>
+                            <div class="relative">
+                                {{ form.is_active }}
+                                {% if form.is_active.errors %}<p class="text-rose text-sm mt-1">{{ form.is_active.errors.as_text }}</p>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end">
+                <button type="submit" 
+                        class="btn btn-lg shadow-lg" 
+                        style="background-color: var(--color-rose); color: var(--color-ink); border-color: var(--color-rose);">
+                    {% if object %}Save Changes{% else %}Post Internship{% endif %}
+                </button>
+            </div>
+            
+        </form>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('form');
+        if (form) {
+            // Apply styling to all text-based fields, selects, and textareas
+            form.querySelectorAll('input:not([type="checkbox"]), textarea, select').forEach(input => {
+                let classesToAdd = ['w-full', 'p-3', 'border', 'rounded-md', 'focus:ring-brand', 'focus:border-brand', 'border-line', 'border-2'];
+
+                if (input.tagName === 'TEXTAREA') {
+                    // Set height for textareas (Description/Requirements)
+                    input.classList.add('h-40', 'resize-none', 'text-left');
+                } else if (input.tagName === 'SELECT') {
+                    // Handle select boxes for Type and Is Active
+                    input.classList.add('appearance-none');
+                }
+                
+                input.classList.add(...classesToAdd);
+            });
+            
+            // Add custom placeholder text where input fields are empty
+            document.getElementById('id_title').placeholder = 'Add internship title';
+            document.getElementById('id_location').placeholder = 'e.g., Khobar, Saudi Arabia';
+            document.getElementById('id_description').placeholder = 'Add internship Description';
+            document.getElementById('id_requirements').placeholder = 'Add internship Requirements';
+
+            // NOTE: Deadline input type is typically 'date', styling may vary.
+            const deadlineInput = document.getElementById('id_deadline');
+            if (deadlineInput) {
+                deadlineInput.type = 'date'; // Force date type if not set by form
+            }
+        }
+    });
+</script>
+{% endblock extra_js %}
+{% endblock content %}

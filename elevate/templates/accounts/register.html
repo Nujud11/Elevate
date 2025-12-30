@@ -1,0 +1,91 @@
+{% extends "website/base_site.html" %}
+{% load static %}
+
+{% block content %}
+
+<section class="min-h-[50vh] flex items-center justify-center pt-12 pb-20"
+         style="background: linear-gradient(to bottom, #fdf4f2 5%, #fff 35%);">
+    
+    <div class="w-full px-4 sm:px-6 lg:px-8">
+
+        <header class="text-center mb-10">
+            <h1 class="text-ink text-3xl font-extrabold mb-2">
+                Registration form
+            </h1>
+            <p class="text-muted text-lg">
+                Join us to apply for Internships and Elevate your Career! 
+            </p>
+        </header>
+
+        <div class="card p-8 sm:p-10 mx-auto max-w-4xl"> {# Card width max-w-xl #}
+            
+            <form method="post" action="{% url 'register' %}">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="bg-rose/20 text-rose border border-rose p-3 rounded-md mb-4 text-sm" role="alert">
+                        {% for error in form.non_field_errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% for field in form %}
+                    <div class="mb-5">
+                        <label for="{{ field.id_for_label }}" class="block text-ink font-medium mb-2">
+                            {{ field.label_tag }}
+                        </label>
+                        <div class="relative">
+                            
+                            {# Render the field's widget (input/select) #}
+                            {{ field }}
+                            
+                            {# Display field-specific help text/validation rules #}
+                            {% if field.help_text %}
+                                <p class="text-muted text-xs mt-1">{{ field.help_text|safe }}</p>
+                            {% endif %}
+                        </div>
+
+                        {# Display field errors #}
+                        {% if field.errors %}
+                            <p class="text-rose text-sm mt-1">{{ field.errors.as_text }}</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+
+                <button type="submit" 
+                        class="btn btn-lg w-full shadow-lg mt-8" 
+                        style="background-color: var(--color-rose); color: var(--color-ink); border-color: var(--color-rose);">
+                    Register Now!
+                </button>
+            </form>
+
+            <p class="text-center text-muted text-sm mt-4">
+                Already have an account? 
+                <a href="{% url 'login' %}" class="text-brand font-semibold hover:text-accent">Login</a>
+            </p>
+        </div>
+    </div>
+</section>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('form');
+        if (form) {
+            form.querySelectorAll('input:not([type="checkbox"]):not([type="radio"]), select').forEach(input => {
+                // Add base classes including border-2 for thickness
+                let classesToAdd = ['w-full', 'p-3', 'border', 'rounded-md', 'focus:ring-brand', 'focus:border-brand', 'border-line', 'border-2'];
+
+                // Handle the select element specially if it exists
+                if (input.tagName === 'SELECT') {
+                    input.classList.add('appearance-none');
+                }
+
+                input.classList.add(...classesToAdd);
+            });
+        }
+    });
+</script>
+{% endblock extra_js %}
+{% endblock content %}

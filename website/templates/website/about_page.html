@@ -1,0 +1,52 @@
+{% extends "website/base_site.html" %}
+{% load static wagtailcore_tags %}
+
+{% block content %}
+
+<div class="h-52 flex flex-col items-center justify-center text-center px-4 sm:px-6 lg:px-8" style="background: linear-gradient(to right, #fdf4f2, var(--color-accent) 80%);">
+    <h1 class="text-ink text-4xl font-extrabold mb-2">{{ page.page_heading }}</h1>
+    <p class="max-w-2xl text-muted text-xl">{{ page.sub_heading }}</p>
+</div>
+
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 my-16">
+
+    {# Intra-page navigation (remains centered) #}
+    <nav class="mb-12 text-center space-x-4">
+        {% for block in page.body %}
+            {% if block.value.section_id %}
+                <a href="#{{ block.value.section_id }}" class="text-brand font-medium hover:underline text-lg">
+                    {{ block.value.section_title }}
+                </a>
+            {% endif %}
+        {% endfor %}
+    </nav>
+
+    {# Render StreamField Blocks #}
+    {% for block in page.body %}
+        {% include_block block %}
+    {% endfor %}
+
+</div>
+
+{% endblock content %}
+
+{% block extra_css %}
+<style>
+/* Add smooth scrolling for anchor links */
+html {
+  scroll-behavior: smooth;
+}
+/* Offset scroll position to account for sticky header */
+.scroll-mt-20 {
+  scroll-margin-top: 5rem; /* Adjust this value based on your header's height */
+}
+/* Ensure prose text within blocks is centered */
+.prose {
+    text-align: center;
+}
+.prose > * {
+    margin-left: auto;
+    margin-right: auto;
+}
+</style>
+{% endblock extra_css %}

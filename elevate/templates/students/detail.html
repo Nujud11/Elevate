@@ -1,0 +1,117 @@
+{% extends "website/base_site.html" %}
+{% load wagtailimages_tags static %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+
+    <div class="company-header flex items-center gap-6">
+        <div class="company-avatar">   
+            {% with owner_profile=job.owner.profile %}
+                {% if owner_profile.avatar %}
+                    <img src="{{ owner_profile.avatar.url }}" alt="{{ job.owner.username }} logo" class="h-full w-full object-cover rounded-full">
+                {% else %}
+                    {{ job.owner.username|slice:":1" }}
+                {% endif %}
+            {% endwith %}
+            </div>
+        <div>
+            <h1 class="text-ink text-3xl font-bold">{{ job.owner.username }}</h1>
+            <p class="text-muted text-lg">{{ job.owner.email|default:"contact@company.com" }}</p>
+        </div>
+    </div>
+
+    <div class="detail-banner">
+        <h2 class="text-3xl font-extrabold">{{ job.title }}</h2>
+    </div>
+
+    <div class="grid lg:grid-cols-3 gap-8">
+        
+        <div class="lg:col-span-2">
+            
+            <div class="detail-card">
+                <h2>Description</h2>
+                <div class="text-ink text-base leading-relaxed">
+                    {{ job.description|safe|linebreaks }}
+                </div>
+            </div>
+
+            <div class="detail-card">
+                <h2>Requirements</h2>
+                <div class="text-ink text-base leading-relaxed">
+                    {% if job.requirements %}
+                        {{ job.requirements|safe|linebreaks }}
+                    {% else %}
+                        <p class="text-muted">No specific requirements listed.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-1">
+            <div class="detail-card bg-bg-soft border-line">
+                <h2>Details</h2>
+
+                <div class="meta-detail-card">
+                    <p class="text-ink font-semibold">Location</p>
+                    <strong class="text-muted font-normal text-base">{{ job.location }}</strong>
+                </div>
+
+                <div class="meta-detail-card">
+                    <p class="text-ink font-semibold">Type</p>
+                    <strong class="text-muted font-normal text-base">{% if job.is_remote %}Remote{% else %}On-site{% endif %}</strong>
+                </div>
+
+                <div class="meta-detail-card">
+                    <p class="text-ink font-semibold">Posted at</p>
+                    <strong class="text-muted font-normal text-base">{{ job.posted_at|date:"d M Y" }}</strong>
+                </div>
+
+                <div class="meta-detail-card">
+                    <p class="text-ink font-semibold">Deadline</p>
+                    <strong class="text-muted font-normal text-base">{{ job.deadline|date:"d M Y" }}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-6 mb-12">
+    
+      {# Establish core variables once #}
+      {% with is_auth=request.user.is_authenticated %}
+      {% with user_role=request.user.profile.role|default:"" %}
+  
+          {# Check if the user is a Company and the Owner #}
+          {% if is_auth and user_role == 'company' and request.user == job.owner %}
+              <a href="{% url 'company_edit' pk=job.pk %}" class="btn btn-primary btn-lg shadow-xl" style="background-color: var(--color-brand); color: var(--color-bg);">
+                  Edit Internship
+              </a>
+  
+          {# Check if the user is a Company (but not the owner) #}
+          {% elif is_auth and user_role == 'company' %}
+              <p class="mt-2 text-sm text-muted">This is a management view for reference only.</p>
+  
+          {# Check if the user is a Student #}
+          {% elif is_auth and user_role == 'student' %}
+              {% if already_applied %}
+                  <button disabled class="btn btn-lg btn-ghost opacity-70 border-accent text-accent cursor-not-allowed">
+                      Applied on {% if submitted_at %}{{ submitted_at|date:"d M Y" }}{% else %}[Date]{% endif %}
+                  </button>
+                  <p class="mt-2 text-sm text-muted">Your application is currently under review.</p>
+              {% else %}
+                  <a href="{% url 'student_apply' pk=job.pk %}" class="btn btn-primary btn-lg shadow-xl" style="background-color: var(--color-rose); color: var(--color-ink);">
+                      Apply Now!
+                  </a>
+              {% endif %}
+  
+          {% else %}
+              <a href="{% url 'login' %}?next={% url 'student_apply' pk=job.pk %}" class="btn btn-lg shadow-xl" style="background-color: var(--color-rose); color: var(--color-ink);">
+                  Apply Now!
+              </a>
+              <p class="mt-2 text-sm text-muted">You'll be asked to log in or register first</p>
+  
+          {% endif %}
+      {% endwith %}
+      {% endwith %}
+   </div>
+</div>
+{% endblock content %}
